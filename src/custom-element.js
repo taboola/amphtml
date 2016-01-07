@@ -304,6 +304,9 @@ export function createAmpElementProto(win, name, implementationClass) {
     /** @private {!SizeList|null|undefined} */
     this.sizeList_;
 
+    /** @private {!AspectList_|null|undefined} */
+    this.aspectList_;
+
     /**
      * This element can be assigned by the {@link applyLayout_} to a child
      * element that will be used to size this element.
@@ -525,6 +528,18 @@ export function createAmpElementProto(win, name, implementationClass) {
       this.sizeList_ = sizesAttr ? parseSizeList(sizesAttr) : null;
     }
     if (this.sizeList_) {
+      this.style.width = assertLength(this.sizeList_.select(
+          this.ownerDocument.defaultView));
+    }
+    // Aspects.
+    if (this.aspectList_ === undefined) {
+      const aspectList_ = this.getAttribute('aspects');
+      this.aspectList_ = aspectList_ ? parseSizeList(aspectList_) : null;
+    }
+
+    if (this.aspectList_ && this.layout_ === Layout.RESPONSIVE || this.sizerElement_) {
+      const newWidth = assertPercent(this.sizeList_.select(this.ownerDocument.defaultView));
+
       this.style.width = assertLength(this.sizeList_.select(
           this.ownerDocument.defaultView));
     }
