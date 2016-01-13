@@ -15,7 +15,7 @@
  */
 
 import {Resource, ResourceState_, Resources, TaskQueue_} from
-    '../../src/resources';
+    '../../src/service/resources-impl';
 import {layoutRectLtwh} from '../../src/layout-rect';
 import * as sinon from 'sinon';
 
@@ -321,7 +321,7 @@ describe('Resources discoverWork', () => {
     resources.visible_ = false;
     resources.prerenderSize_ = 1;
     viewportMock.expects('getRect').returns(
-        layoutRectLtwh(0, 0, 300, 400)).once();
+        layoutRectLtwh(0, 0, 300, 1009)).once();
 
     resources.discoverWork_();
 
@@ -453,7 +453,7 @@ describe('Resources changeHeight', () => {
     expect(resources.relayoutTop_).to.equal(resource1.layoutBox_.top);
   });
 
-  describe('requestChangeHeight rules when element is in viewport', () => {
+  describe('attemptChangeHeight rules when element is in viewport', () => {
     let overflowCallbackSpy;
     let vsyncSpy;
 

@@ -76,6 +76,7 @@ var forbiddenTerms = {
     whitelist: [
       'src/amp-core-service.js',
       'src/service/history-impl.js',
+      'src/service/resources-impl.js',
       'src/service/viewer-impl.js',
       'src/service/viewport-impl.js',
       'src/service/vsync-impl.js',
@@ -85,6 +86,7 @@ var forbiddenTerms = {
     message: privateServiceFactory,
     whitelist: [
       'src/amp-core-service.js',
+      'src/service/resources-impl.js',
       'src/service/viewport-impl.js',
     ],
   },
@@ -92,8 +94,16 @@ var forbiddenTerms = {
     message: privateServiceFactory,
     whitelist: [
       'src/amp-core-service.js',
+      'src/service/resources-impl.js',
       'src/service/viewport-impl.js',
       'src/service/vsync-impl.js',
+    ],
+  },
+  'installResourcesService': {
+    message: privateServiceFactory,
+    whitelist: [
+      'src/amp-core-service.js',
+      'src/service/resources-impl.js',
     ],
   },
   // Privacy sensitive
@@ -133,6 +143,7 @@ var forbiddenTerms = {
   'setCookie\\W': {
     message: requiresReviewPrivacy,
     whitelist: [
+      'src/service/cid-impl.js',
       'src/cookies.js',
       'src/experiments.js',
       'tools/experiments/experiments.js',
@@ -173,7 +184,12 @@ var forbiddenTerms = {
   // No spread (eg. test(...args) allowed since we dont ship with Array
   // polyfills except `arguments` spread as babel does not polyfill
   // it since it can assume that it can `slice` w/o the use of helpers.
-  '\\.\\.\\.(?!arguments\\))[_$A-Za-z0-9]*(?:\\)|])': es6polyfill
+  '\\.\\.\\.(?!arguments\\))[_$A-Za-z0-9]*(?:\\)|])': {
+    message: es6polyfill,
+    whitelist: [
+      'extensions/amp-access/0.1/access-expr-impl.js',
+    ],
+  }
 };
 
 var ThreePTermsMessage = 'The 3p bootstrap iframe has no polyfills loaded and' +
