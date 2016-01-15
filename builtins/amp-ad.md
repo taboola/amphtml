@@ -64,13 +64,25 @@ Optional attribute to pass configuration to the ad as an arbitrarily complex JSO
 
 #### Placeholder
 
-Optionally `amp-ad` supports a child element with the `placeholder` attribute. If supported by the ad network, this element is shown if no ad is available for this slot.
+Optionally `amp-ad` supports a child element with the `placeholder` attribute. If supported by the ad network, this element is shown until the ad is available for viewing.
 ```html
 <amp-ad width=300 height=250
     type="foo">
   <div placeholder>Have a great day!</div>
 </amp-ad>
 ```
+
+#### No Ad available
+- `amp-ad` supports a child element with the `fallback` attribute. If supported by the ad network, this element is shown if no ad is available for this slot.
+```html
+<amp-ad width=300 height=250
+    type="foo">
+  <div fallback>Have a great day!</div>
+</amp-ad>
+```
+
+- If there is no fallback element available, the amp-ad tag will be collapsed (set to display: none) if the ad sends a message that the ad slot cannot be filled and AMP determines that this operation can be performed without affecting the user's scroll position.
+
 #### Supported ad networks
 
 - [A9](../ads/a9.md)
@@ -90,7 +102,7 @@ To enable this, copy the file [remote.html](../3p/remote.html) to your web serve
 <meta name="amp-3p-iframe-src" content="https://assets.your-domain.com/path/to/remote.html">
 ```
 
-The `content` attribute of the meta tag is the absolute URL to your copy of the remote.html file on your web server. This URL must use a "https" schema. It is not allowed to reside on the same origin as your AMP files. E.g. if you host AMP files on "www.example.com", this URL must not be on "www.example.com" but e.g. "something-else.example.com" is OK.
+The `content` attribute of the meta tag is the absolute URL to your copy of the remote.html file on your web server. This URL must use a "https" schema. It is not allowed to reside on the same origin as your AMP files. E.g. if you host AMP files on "www.example.com", this URL must not be on "www.example.com" but e.g. "something-else.example.com" is OK. The reason for this limitation is that AMP documents may be served by AMP caches on different origins. If the iframe is never on the same origin as the parent frame, it becomes less likely that one accidentally deploys code that relies on them being same origin, which would break in the 'AMP cache" scenario.
 
 ##### Enhance incoming ad configuration
 

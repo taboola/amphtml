@@ -61,7 +61,10 @@ var karma = {
     configFile: karmaConf,
     singleRun: true,
     client: {
-      captureConsole: false
+      captureConsole: false,
+      amp: {
+        useCompiledJs: false
+      }
     }
   },
   firefox: {
@@ -123,12 +126,13 @@ module.exports = {
     '**/*.js',
     '!{node_modules,build,dist,dist.3p,dist.tools,' +
         'third_party,build-system}/**/*.*',
-    '!{testing,examples}/**/*.*',
+    '!{testing,examples,examples.build}/**/*.*',
     // TODO: temporary, remove when validator is up to date
     '!validator/**/*.*',
     '!gulpfile.js',
     '!karma.conf.js',
     '!**/local-amp-chrome-extension/background.js',
+    '!extensions/amp-access/0.1/access-expr-impl.js',
   ],
   presubmitGlobs: [
     '**/*.{css,js,go}',

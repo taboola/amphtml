@@ -20,7 +20,7 @@ Displays an iframe.
 
 `amp-iframe` has several important differences from vanilla iframes that are designed to make it more secure and avoid AMP files that are dominated by a single iframe:
 
-- `amp-iframe` may not appear close to the top of the document (except for `click-to-play` iframes as described below). They must be either 600px away from the top or not within the first 75% of the viewport when scrolled to the top – whichever is smaller. NOTE: We are currently looking for feedback as to how well this restriction works in practice.
+- `amp-iframe` may not appear close to the top of the document (except for iframes that use `placeholder` as described below). They must be either 600px away from the top or not within the first 75% of the viewport when scrolled to the top – whichever is smaller. NOTE: We are currently looking for feedback as to how well this restriction works in practice.
 - They are sandboxed by default. [Details](#sandbox)
 - They must only request resources via HTTPS or from a data-URI or via the srcdoc attribute.
 - They must not be in the same origin as the container unless they do not allow `allow-same-origin` in the sandbox attribute.
@@ -90,8 +90,8 @@ Here are some factors that affect how fast the resize will be executed:
 - Whether the resize is requested for a currently active IFrame;
 - Whether the resize is requested for an IFrame below the viewport or above the viewport.
 
-#### Iframe Click-To-Play
-It is possible to have an `amp-iframe` appear on the top of a document when the `amp-ifame` has a `placeholder` element as shown in the example below.
+#### Iframe with Placeholder
+It is possible to have an `amp-iframe` appear on the top of a document when the `amp-iframe` has a `placeholder` element as shown in the example below.
 
 ```html
 <amp-iframe width=300 height=300
