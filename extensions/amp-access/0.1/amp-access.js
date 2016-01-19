@@ -23,7 +23,7 @@ import {documentStateFor} from '../../../src/document-state';
 import {evaluateAccessExpr} from './access-expr';
 import {getService} from '../../../src/service';
 import {installStyles} from '../../../src/styles';
-import {isExperimentOn} from '../../../src/experiments';
+import {isDevChannel, isExperimentOn} from '../../../src/experiments';
 import {listenOnce} from '../../../src/event-helper';
 import {log} from '../../../src/log';
 import {onDocumentReady} from '../../../src/document-state';
@@ -91,7 +91,8 @@ export class AccessService {
     installStyles(this.win.document, $CSS$, () => {});
 
     /** @const @private {boolean} */
-    this.isExperimentOn_ = isExperimentOn(this.win, EXPERIMENT);
+    this.isExperimentOn_ = (isExperimentOn(this.win, EXPERIMENT) ||
+        isDevChannel(this.win));
 
     const accessElement = document.getElementById('amp-access');
 
@@ -142,6 +143,9 @@ export class AccessService {
 
     /** @private {?Promise<string>} */
     this.readerIdPromise_ = null;
+
+    /** @private {?JSONObject} */
+    this.authResponse_ = null;
 
     /** @private {!Promise} */
     this.firstAuthorizationPromise_ = new Promise(resolve => {
@@ -276,14 +280,24 @@ export class AccessService {
 
   /**
    * @param {string} url
+   * @param {boolean} useAuthData Allows `AUTH(field)` URL var substitutions.
    * @return {!Promise<string>}
    * @private
    */
-  buildUrl_(url) {
+  buildUrl_(url, useAuthData) {
     return this.getReaderId_().then(readerId => {
-      return this.urlReplacements_.expand(url, {
+      const vars = {
         'READER_ID': readerId
-      });
+      };
+      if (useAuthData) {
+        vars['AUTHDATA'] = field => {
+          if (this.authResponse_) {
+            return this.authResponse_[field];
+          }
+          return undefined;
+        };
+      }
+      return this.urlReplacements_.expand(url, vars);
     });
   }
 
@@ -300,12 +314,14 @@ export class AccessService {
 
     log.fine(TAG, 'Start authorization via ', this.config_.authorization);
     this.toggleTopClass_('amp-access-loading', true);
-    return this.buildUrl_(this.config_.authorization).then(url => {
+    const promise = this.buildUrl_(
+        this.config_.authorization, /* useAuthData */ false);
+    return promise.then(url => {
       log.fine(TAG, 'Authorization URL: ', url);
       return this.xhr_.fetchJson(url, {credentials: 'include'});
     }).then(response => {
       log.fine(TAG, 'Authorization response: ', response);
-      this.firstAuthorizationResolver_();
+      this.setAuthResponse_(response);
       this.toggleTopClass_('amp-access-loading', false);
       return new Promise((resolve, reject) => {
         onDocumentReady(this.win.document, () => {
@@ -316,6 +332,15 @@ export class AccessService {
       log.error(TAG, 'Authorization failed: ', error);
       this.toggleTopClass_('amp-access-loading', false);
     });
+  }
+
+  /**
+   * @param {!JSONObject} authResponse
+   * @private
+   */
+  setAuthResponse_(authResponse) {
+    this.authResponse_ = authResponse;
+    this.firstAuthorizationResolver_();
   }
 
   /**
@@ -514,7 +539,9 @@ export class AccessService {
       log.fine(TAG, 'Ignore pingback');
       return Promise.resolve();
     }
-    return this.buildUrl_(this.config_.pingback).then(url => {
+    const promise = this.buildUrl_(
+        this.config_.pingback, /* useAuthData */ true);
+    return promise.then(url => {
       log.fine(TAG, 'Pingback URL: ', url);
       return this.xhr_.sendSignal(url, {
         method: 'POST',
@@ -566,7 +593,7 @@ export class AccessService {
 
     log.fine(TAG, 'Start login');
     const urlPromise = this.buildUrl_(assert(this.config_.login,
-        'Login URL is not configured'));
+        'Login URL is not configured'), /* useAuthData */ true);
     this.loginPromise_ = this.openLoginDialog_(urlPromise).then(result => {
       log.fine(TAG, 'Login dialog completed: ', result);
       this.loginPromise_ = null;
