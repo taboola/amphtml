@@ -91,6 +91,7 @@ function buildExtensions(options) {
    * Please see {@link AmpCarousel} with `type=slides` attribute instead.
    */
   buildExtension('amp-slides', '0.1', false, options);
+  buildExtension('amp-taboola', '0.1', false, options);
   buildExtension('amp-twitter', '0.1', false, options);
   buildExtension('amp-user-notification', '0.1', true, options);
   buildExtension('amp-vine', '0.1', false, options);
@@ -308,6 +309,7 @@ function buildExamples(watch) {
   buildExample('ads.amp.html');
   buildExample('analytics.amp.html');
   buildExample('article.amp.html');
+  buildExample('taboola.amp.html');
   buildExample('article-access.amp.html');
   buildExample('metadata-examples/article-json-ld.amp.html');
   buildExample('metadata-examples/article-microdata.amp.html');
