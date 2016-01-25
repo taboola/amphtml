@@ -538,7 +538,7 @@ export function createAmpElementProto(win, name, implementationClass) {
     // Heights.
     if (this.heightsList_ === undefined) {
       const heightsList_ = this.getAttribute('heights');
-      this.heightsList_ = heightsList_ ? parseSizeList(heightsList_) : null;
+      this.heightsList_ = heightsList_ ? parseSizeList(heightsList_, true) : null;
     }
 
     if (this.heightsList_ && this.layout_ ===
