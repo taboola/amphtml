@@ -61,7 +61,8 @@ export function parseSizeList(s, allowPercentAsLength) {
       sizeStr = sSize;
       mediaStr = undefined;
     }
-    sizes.push({mediaQuery: mediaStr, size: assertLength(sizeStr, allowPercentAsLength)});
+    sizes.push({mediaQuery: mediaStr,
+      size: assertLength(sizeStr, allowPercentAsLength)});
   });
   return new SizeList(sizes);
 };
