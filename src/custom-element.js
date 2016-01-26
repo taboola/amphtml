@@ -1101,16 +1101,16 @@ function isElementScheduled(win, elementName) {
  *                 to override the original state with new default values
  */
 export function registerElementAlias(win, aliasName, sourceName, state) {
-  var implementationClass = knownElements[sourceName];
+  const implementationClass = knownElements[sourceName];
 
   if (implementationClass) {
     const proto = createAmpElementProto(win, aliasName, implementationClass);
     const originalCreatedCallback = proto.createdCallback;
 
     if (state) {
-      proto.createdCallback = function () {
+      proto.createdCallback = function() {
         originalCreatedCallback.call(this);
-        Object.keys(state).forEach(p = > this.setAttribute(p, state[p]));
+        Object.keys(state).forEach(p => this.setAttribute(p, state[p]));
       };
     }
 
@@ -1119,7 +1119,8 @@ export function registerElementAlias(win, aliasName, sourceName, state) {
     });
 
   } else {
-    throw new Error('Element name is unknown: ' + sourceName + '. Alias ' + aliasName + ' was not registered.');
+    throw new Error(`Element name is unknown: ${sourceName}.` +
+                     `Alias ${aliasName} was not registered.`);
   }
 }
 
