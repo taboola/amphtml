@@ -19,7 +19,8 @@ The `amp-embed` element is used to allow embedding elements in to the AMP page.
 
 #### Implementation
 
-The `<amp-embed>` is actually an alias to the `<amp-ad>` tag, deriving all of it's functionality with a different tag name.
+The `<amp-embed>` is actually an alias to the [`<amp-ad>`](amp-ad.md)  tag, deriving all of it's functionality with a different tag name. 
+Can be used instead of `<amp-ad>` when that would be semanitcally more accurate.  
 
 ```html
 <amp-embed width=400 height=300
@@ -28,5 +29,5 @@ The `<amp-embed>` is actually an alias to the `<amp-ad>` tag, deriving all of it
         data-mode=themode
         data-article=auto
         data-placement="Below Article Thumbnails">
-</amp-embed
+</amp-embed>
 ```
