@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {Layout, assertLength, getLayoutClass, getLengthNumeral, getLengthUnits,
-          isInternalElement, isLayoutSizeDefined, isLoadingAllowed,
-          parseLayout, parseLength, getNaturalDimensions,
-          hasNaturalDimensions} from './layout';
+import {Layout, getLayoutClass, getLengthNumeral, getLengthUnits,
+    isInternalElement, isLayoutSizeDefined, isLoadingAllowed,
+    parseLayout, parseLength, getNaturalDimensions,
+    hasNaturalDimensions} from './layout';
 import {ElementStub, stubbedElements} from './element-stub';
 import {assert} from './asserts';
 import {createLoaderElement} from '../src/loader';
@@ -145,7 +145,7 @@ export function applyLayout_(element) {
 
   // Calculate effective width and height.
   if ((!inputLayout || inputLayout == Layout.FIXED ||
-          inputLayout == Layout.FIXED_HEIGHT) &&
+      inputLayout == Layout.FIXED_HEIGHT) &&
       (!inputWidth || !inputHeight) && hasNaturalDimensions(element.tagName)) {
     // Default width and height: handle elements that do not specify a
     // width/height and are defined to have natural browser dimensions.
@@ -165,7 +165,7 @@ export function applyLayout_(element) {
     layout = Layout.CONTAINER;
   } else if (height && (!width || width == 'auto')) {
     layout = Layout.FIXED_HEIGHT;
-  } else if (height && width && sizesAttr) {
+  } else if (height && width && (sizesAttr || heightsAttr)) {
     layout = Layout.RESPONSIVE;
   } else {
     layout = Layout.FIXED;
@@ -173,7 +173,7 @@ export function applyLayout_(element) {
 
   // Verify layout attributes.
   if (layout == Layout.FIXED || layout == Layout.FIXED_HEIGHT ||
-          layout == Layout.RESPONSIVE) {
+      layout == Layout.RESPONSIVE) {
     assert(height, 'Expected height to be available: %s', heightAttr);
   }
   if (layout == Layout.FIXED_HEIGHT) {
@@ -183,8 +183,8 @@ export function applyLayout_(element) {
   }
   if (layout == Layout.FIXED || layout == Layout.RESPONSIVE) {
     assert(width && width != 'auto',
-          'Expected width to be available and not equal to "auto": %s',
-          widthAttr);
+        'Expected width to be available and not equal to "auto": %s',
+        widthAttr);
   }
   if (layout == Layout.RESPONSIVE) {
     assert(getLengthUnits(width) == getLengthUnits(height),
@@ -235,8 +235,8 @@ function isInternalOrServiceNode(node) {
     return true;
   }
   if (node.tagName && (node.hasAttribute('placeholder') ||
-          node.hasAttribute('fallback') ||
-          node.hasAttribute('overflow'))) {
+      node.hasAttribute('fallback') ||
+      node.hasAttribute('overflow'))) {
     return true;
   }
   return false;
@@ -308,8 +308,8 @@ export function createAmpElementProto(win, name, implementationClass) {
     /** @private {!SizeList|null|undefined} */
     this.sizeList_;
 
-    /** @private {!AspectList_|null|undefined} */
-    this.aspectList_;
+    /** @private {!heightsList_|null|undefined} */
+    this.heightsList_;
 
     /**
      * This element can be assigned by the {@link applyLayout_} to a child
@@ -381,7 +381,7 @@ export function createAmpElementProto(win, name, implementationClass) {
     this.classList.remove('-amp-unresolved');
     this.implementation_.createdCallback();
     if (this.layout_ != Layout.NODISPLAY &&
-          !this.implementation_.isLayoutSupported(this.layout_)) {
+        !this.implementation_.isLayoutSupported(this.layout_)) {
       throw new Error('Layout not supported: ' + this.layout_);
     }
     this.implementation_.layout_ = this.layout_;
@@ -492,7 +492,7 @@ export function createAmpElementProto(win, name, implementationClass) {
         // Already in viewport - start showing loading.
         this.toggleLoading_(true);
       } else if (layoutBox.top < PREPARE_LOADING_THRESHOLD_ &&
-            layoutBox.top >= 0) {
+          layoutBox.top >= 0) {
         // Few top elements will also be pre-initialized with a loading
         // element.
         this.getVsync_().mutate(() => {
@@ -532,22 +532,19 @@ export function createAmpElementProto(win, name, implementationClass) {
       this.sizeList_ = sizesAttr ? parseSizeList(sizesAttr) : null;
     }
     if (this.sizeList_) {
-      this.style.width = assertLength(this.sizeList_.select(
-          this.ownerDocument.defaultView));
+      this.style.width = this.sizeList_.select(this.ownerDocument.defaultView);
     }
     // Heights.
     if (this.heightsList_ === undefined) {
-      const heightsList_ = this.getAttribute('heights');
-      this.heightsList_ = heightsList_ ?
-          parseSizeList(heightsList_, true) : null;
+      const heightsAttr = this.getAttribute('heights');
+      this.heightsList_ = heightsAttr ?
+          parseSizeList(heightsAttr, /* allowPercent */ true) : null;
     }
 
     if (this.heightsList_ && this.layout_ ===
         Layout.RESPONSIVE && this.sizerElement_) {
-      if (this.sizerElement_) {
-        this.sizerElement_.style.paddingTop = assertLength(
-          this.heightsList_.select(this.ownerDocument.defaultView), true);
-      }
+      this.sizerElement_.style.paddingTop = this.heightsList_.select(
+          this.ownerDocument.defaultView);
     }
   };
 
@@ -617,7 +614,7 @@ export function createAmpElementProto(win, name, implementationClass) {
     try {
       this.layout_ = applyLayout_(this);
       if (this.layout_ != Layout.NODISPLAY &&
-            !this.implementation_.isLayoutSupported(this.layout_)) {
+          !this.implementation_.isLayoutSupported(this.layout_)) {
         throw new Error('Layout not supported for: ' + this.layout_);
       }
       this.implementation_.layout_ = this.layout_;
@@ -929,12 +926,10 @@ export function createAmpElementProto(win, name, implementationClass) {
     if (this.loadingDisabled_ === undefined) {
       this.loadingDisabled_ = this.hasAttribute('noloading');
     }
-    if (this.loadingDisabled_ ||
-            !isLoadingAllowed(this.tagName) ||
-            this.layoutWidth_ < MIN_WIDTH_FOR_LOADING_ ||
-            this.layoutCount_ > 0 ||
-            isInternalOrServiceNode(this) ||
-            !isLayoutSizeDefined(this.layout_)) {
+    if (this.loadingDisabled_ || !isLoadingAllowed(this.tagName) ||
+        this.layoutWidth_ < MIN_WIDTH_FOR_LOADING_ ||
+        this.layoutCount_ > 0 ||
+        isInternalOrServiceNode(this) || !isLayoutSizeDefined(this.layout_)) {
       return false;
     }
     return true;
