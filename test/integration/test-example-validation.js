@@ -62,7 +62,7 @@ describe('example', function() {
    * @constructor {!Array<!RegExp>}
    */
   const errorWhitelist = [
-    /INVALID_ATTR_VALUE src=\.\/viewer-integr\.js/, 
+    /INVALID_ATTR_VALUE src=\.\/viewer-integr\.js/,
     /DISALLOWED_TAG amp-embed/
   ];
 
