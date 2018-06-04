@@ -853,7 +853,9 @@ export const adConfig = {
     renderStartImplemented: true,
   },
 
-  taboola: {},
+  taboola: {
+	  consentHandlingOverride: true,
+  },
 
   teads: {
     prefetch: 'https://cdn.teads.tv/media/format/v3/teads-format.min.js',
