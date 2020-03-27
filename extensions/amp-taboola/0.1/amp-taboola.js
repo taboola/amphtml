@@ -21,8 +21,11 @@ export class AmpTaboola extends AMP.BaseElement {
         });
     }
 
-    createTaboolaEmbed({ component, placement, mode, height, width }) {
+    createTaboolaEmbed({ component, placement, mode, responsive = true, height, width }) {
             const taboolaEmbed = this.element.ownerDocument.createElement(`amp-${component}`);
+            if (responsive) {
+                taboolaEmbed.setAttribute('layout', 'responsive');
+            }
             taboolaEmbed.setAttribute('type', 'taboola');
             taboolaEmbed.setAttribute('height', height);
             taboolaEmbed.setAttribute('width', width);
@@ -49,6 +52,7 @@ export class AmpTaboola extends AMP.BaseElement {
         stickyAd.setAttribute('layout', 'nodisplay');
         const taboolaEmbed = this.createTaboolaEmbed({
             component: 'ad',
+            responsive: false,
             placement: 'Ads Example',
             mode: data.mode,
             height: 100,
