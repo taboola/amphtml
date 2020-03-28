@@ -43,6 +43,10 @@ export class AmpTaboola extends AMP.BaseElement {
                 if (data.loadNextUp) {
                     this.loadNextUp(data.loadNextUp);
                 }
+
+                if (data.loadReadMore) {
+                    this.loadReadMore(data.loadReadMore);
+                }
             }
         });
     }
@@ -61,6 +65,28 @@ export class AmpTaboola extends AMP.BaseElement {
 
         stickyAd.appendChild(taboolaEmbed);
         this.element.ownerDocument.body.appendChild(stickyAd);
+    }
+
+    loadReadMore(data) {
+        const button = this.element.ownerDocument.createElement('button');
+        const content = this.element.ownerDocument.querySelector(data.boxSelector);
+
+        content.style.height = `${data.minimizedSize}px`;
+        content.style.overflow = 'hidden';
+        button.style.width = '100%';
+        button.style.height = '80px';
+        button.style.display = 'block';
+        button.style.backgroundColor = '#fff';
+        button.style.border = 'solid 1px #666';
+        button.textContent = data.caption;
+
+        content.insertAdjacentElement('afterend', button);
+
+        button.addEventListener('click', () => {
+            content.style.height = '';
+            content.style.overflow = '';
+            content.parentNode.removeChild(button);
+        });
     }
 }
 
